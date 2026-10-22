@@ -108,6 +108,23 @@ h2{font-size:clamp(1.65rem,4.5vw,2.5rem);line-height:1.15;letter-spacing:-.03em;
 .footer-inner{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}
 .footer small{color:#a9c6b6}
 .tabbar{display:none}
+.mapbox{position:relative;margin-top:12px}
+#map{height:340px;border-radius:16px;border:1px solid var(--line);background:#dfe8e2;isolation:isolate}
+.mapctl{position:absolute;right:10px;top:10px;z-index:500;display:grid;gap:6px}
+.mapctl .btn{min-height:44px;width:44px;padding:0;font-size:1.3rem}
+.pin span{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font:700 .8rem/1 system-ui,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px #0005}
+.pin.me span{background:#d9822b}
+.mcard.hl{outline:3px solid #f2a65a}
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-tile-container,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;position:relative;touch-action:none;-webkit-tap-highlight-color:transparent;outline-offset:1px}
+.leaflet-container img.leaflet-tile{max-width:none!important;max-height:none!important}
+.leaflet-tile,.leaflet-marker-icon{user-select:none;-webkit-user-drag:none}
+.leaflet-tile{visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-tile-pane{z-index:200}.leaflet-marker-pane{z-index:600}
+.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-fade-anim .leaflet-tile{transition:opacity .2s linear}
+.leaflet-marker-icon{cursor:pointer}
 @media(max-width:820px){
  .links{display:none}
  .hero-grid,.finder-grid,.impact-grid{grid-template-columns:1fr}
@@ -175,7 +192,7 @@ h2{font-size:clamp(1.65rem,4.5vw,2.5rem);line-height:1.15;letter-spacing:-.03em;
 <div class="panel"><label class="form-label" for="city">Cidade ou CEP</label>
 <div class="form-row"><input class="field" id="city" placeholder="Ex.: Divinópolis, MG ou 35500-000" autocomplete="off" enterkeyhint="search" aria-describedby="cityErr"><button class="btn" id="searchPlaces" type="button">Pesquisar pontos</button><button class="btn light" id="useLocation" type="button"><svg class="i"><use href="#i-pin"/></svg> Usar localização</button></div>
 <div id="cityErr" role="alert"></div>
-<p class="hint">Funciona para qualquer cidade do Brasil. Os links abrem a busca no Google Maps ou na web.</p>
+<p class="hint">Funciona para qualquer cidade do Brasil. A busca lista farmácias próximas a partir do OpenStreetMap e também oferece links de pesquisa no Google Maps.</p>
 <div class="notice"><strong>Como ler os resultados:</strong> “Ponto confirmado” é um local cadastrado e verificado por este site. “Resultado externo” é apenas uma busca no Google e não foi verificado: confirme com o local se ele recebe medicamentos vencidos ou em desuso.</div>
 <div id="placeResult" style="margin-top:18px" aria-live="polite"></div></div>
 </div></section>
@@ -212,6 +229,7 @@ h2{font-size:clamp(1.65rem,4.5vw,2.5rem);line-height:1.15;letter-spacing:-.03em;
 <a href="#impacto"><svg class="i"><use href="#i-globe"/></svg>Impacto</a>
 </nav>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 "use strict";
 /* ===== Utilitários ===== */
@@ -338,17 +356,81 @@ function externalCard(label,mapQ,webQ,coords){
   const map=coords?'https://www.google.com/maps/search/'+encodeURIComponent('ponto de coleta descarte de medicamentos')+'/@'+coords.latitude+','+coords.longitude+',14z':'https://www.google.com/maps/search/'+encodeURIComponent(mapQ);
   return '<article class="mcard"><span class="tag ext">Resultado externo, não verificado</span><h3>Busca para '+esc(label)+'</h3><p>Estes links abrem uma pesquisa pública. O site não sabe se os locais encontrados aceitam medicamentos: confirme por telefone ou no estabelecimento.</p><div class="actions" style="margin-top:12px"><a class="btn light" target="_blank" rel="noopener noreferrer" href="'+map+'">'+ico('pin')+' Ver no Google Maps ↗</a>'+(webQ?'<a class="btn light" target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?q='+encodeURIComponent(webQ)+'">'+ico('search')+' Pesquisar na web ↗</a>':'')+'</div></article>';
 }
+/* Busca ao vivo: ViaCEP (CEP) + Nominatim (geocodificação) + Overpass (farmácias do OpenStreetMap) */
+let lmap=null;
+const LIVE={nominatim:'https://nominatim.openstreetmap.org/search',overpass:'https://overpass-api.de/api/interpreter',viacep:'https://viacep.com.br/ws/'};
+async function getJson(url,opt){const r=await fetch(url,opt);if(!r.ok)throw new Error(r.status);return r.json()}
+async function geocode(q){const r=await getJson(LIVE.nominatim+'?format=jsonv2&countrycodes=br&limit=1&q='+encodeURIComponent(q));return r[0]?{latitude:+r[0].lat,longitude:+r[0].lon}:null}
+async function resolveCenter(query){
+  if(query.coords)return{latitude:query.coords.latitude,longitude:query.coords.longitude};
+  if(query.cep){
+    const c=await getJson(LIVE.viacep+query.cep+'/json/');
+    if(c.erro)return 'cep';
+    return await geocode([c.logradouro,c.localidade,c.uf,'Brasil'].filter(Boolean).join(', '))||await geocode([c.localidade,c.uf,'Brasil'].join(', '));
+  }
+  return geocode(query.text+', Brasil');
+}
+async function overpass(c,r){
+  const q='[out:json][timeout:25];nwr["amenity"="pharmacy"](around:'+r+','+c.latitude+','+c.longitude+');out center tags 60;';
+  const d=await getJson(LIVE.overpass,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+  return d.elements.map(e=>{
+    const t=e.tags||{},lat=e.lat!=null?e.lat:(e.center&&e.center.lat),lng=e.lon!=null?e.lon:(e.center&&e.center.lon);
+    if(lat==null||lng==null)return null;
+    const end=[[t['addr:street'],t['addr:housenumber']].filter(Boolean).join(', '),t['addr:suburb'],t['addr:city']].filter(Boolean).join(' - ');
+    return{nome:t.name||'Farmácia (sem nome cadastrado)',endereco:end,telefone:t.phone||t['contact:phone']||'',horario:t.opening_hours||'',lat,lng,dist:km(c.latitude,c.longitude,lat,lng)};
+  }).filter(Boolean).sort((a,b)=>a.dist-b.dist).slice(0,15);
+}
+async function liveSearch(query){
+  if(lmap){try{lmap.remove()}catch(e){}lmap=null}
+  try{
+    const c=await resolveCenter(query);
+    if(c==='cep')return{error:'CEP não encontrado. Confira os números ou pesquise pela cidade.'};
+    if(!c)return{error:'Não encontramos esse local. Confira a grafia ou tente o CEP.'};
+    let items=await overpass(c,5000),radius=5;
+    if(!items.length){items=await overpass(c,15000);radius=15}
+    return{ok:true,center:c,items,radius};
+  }catch(e){return{error:'A busca automática de farmácias não está disponível agora (sem conexão ou bloqueada neste ambiente). Use os links de pesquisa abaixo.'}}
+}
+function liveCard(p,i){
+  return '<article class="mcard" id="pt'+i+'"><span class="tag ext">Resultado externo, não verificado</span><h3>'+(i+1)+'. '+esc(p.nome)+'</h3>'+(p.endereco?'<p><strong>Endereço:</strong> '+esc(p.endereco)+'</p>':'')+(p.telefone?'<p><strong>Telefone:</strong> <a href="tel:'+esc(p.telefone.replace(/[^\d+]/g,''))+'">'+esc(p.telefone)+'</a></p>':'')+(p.horario?'<p><strong>Horário (OpenStreetMap, pode estar desatualizado):</strong> '+esc(p.horario)+'</p>':'')+'<p><strong>Distância do ponto pesquisado:</strong> '+p.dist.toFixed(1).replace('.',',')+' km</p><p style="margin-top:10px"><a class="btn light" target="_blank" rel="noopener noreferrer" href="'+routeUrl(p)+'">'+ico('route')+' Abrir rota no Google Maps</a></p></article>';
+}
+function liveHtml(l){
+  if(!l)return '';
+  if(l.error)return '<article class="mcard"><p class="err" style="margin:0">'+esc(l.error)+'</p></article>';
+  const head='<article class="mcard"><span class="tag ext">Resultado externo, não verificado</span><h3>Farmácias próximas (OpenStreetMap)</h3><p>'+(l.items.length?l.items.length+' farmácias em até '+l.radius+' km. O OpenStreetMap não informa quais recebem medicamentos vencidos: ligue e confirme antes de ir.':'Nenhuma farmácia encontrada em até 15 km nos dados do OpenStreetMap. Use os links de pesquisa abaixo.')+'</p></article>';
+  if(!l.items.length)return head;
+  return head+'<div class="mapbox"><div id="map" role="application" aria-label="Mapa das farmácias encontradas"></div><div class="mapctl"><button class="btn light" type="button" id="zin" aria-label="Aproximar o mapa">+</button><button class="btn light" type="button" id="zout" aria-label="Afastar o mapa">−</button></div></div><p class="hint">Mapa © colaboradores do OpenStreetMap. A lista abaixo traz os mesmos locais.</p>'+l.items.map(liveCard).join('');
+}
+function drawMap(l){
+  if(!l||!l.items||!l.items.length)return;
+  const el=$('map');if(!el)return;
+  if(!window.L){el.innerHTML='<p class="hint" style="padding:16px">O mapa não pôde ser carregado. Use a lista abaixo.</p>';return}
+  try{
+    lmap=L.map(el,{zoomControl:false,attributionControl:false}).setView([l.center.latitude,l.center.longitude],14);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(lmap);
+    const pts=[[l.center.latitude,l.center.longitude]];
+    L.marker(pts[0],{icon:L.divIcon({className:'pin me',html:'<span>•</span>',iconSize:[28,28]}),title:'Ponto pesquisado',keyboard:false}).addTo(lmap);
+    l.items.forEach((p,i)=>{
+      pts.push([p.lat,p.lng]);
+      L.marker([p.lat,p.lng],{icon:L.divIcon({className:'pin',html:'<span>'+(i+1)+'</span>',iconSize:[28,28]}),title:p.nome}).addTo(lmap).on('click',()=>{
+        const c=$('pt'+i);if(!c)return;c.scrollIntoView({behavior:'smooth',block:'center'});c.classList.add('hl');setTimeout(()=>c.classList.remove('hl'),2000);
+      });
+    });
+    lmap.fitBounds(pts,{padding:[30,30],maxZoom:16});
+    $('zin').onclick=()=>lmap.zoomIn();$('zout').onclick=()=>lmap.zoomOut();
+  }catch(e){el.innerHTML='<p class="hint" style="padding:16px">O mapa não pôde ser carregado. Use a lista abaixo.</p>'}
+}
 async function runSearch(query,btn){
   const out=$('placeResult');
   out.innerHTML='<p class="hint">Pesquisando…</p>';btn.disabled=true;
   try{
-    const found=await locator.find(query);await wait(200);
+    const found=await locator.find(query);const live=await liveSearch(query);
     const here=query.coords||null;
     const label=query.label;
     let html='<h3 style="margin:0 0 4px">Resultados para '+esc(label)+'</h3>';
     html+=found.length?found.map(p=>pointCard(p,here)).join(''):'<article class="mcard"><span class="tag">Pontos confirmados</span><p>Nenhum ponto confirmado cadastrado para esta busca. Use a busca externa abaixo e confirme com o local.</p></article>';
-    html+=externalCard(label,'ponto de coleta medicamentos vencidos '+label,query.coords?null:'pontos de coleta de medicamentos vencidos em '+label,query.coords);
-    out.innerHTML=html;
+    html+=liveHtml(live)+externalCard(label,'ponto de coleta medicamentos vencidos '+label,query.coords?null:'pontos de coleta de medicamentos vencidos em '+label,query.coords);
+    out.innerHTML=html;drawMap(live);
   }catch(e){out.innerHTML='<p class="err">Não foi possível concluir a pesquisa. Verifique sua conexão e tente novamente.</p>'}
   finally{btn.disabled=false}
 }
