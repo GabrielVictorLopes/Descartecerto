@@ -160,6 +160,26 @@ h2{font-size:clamp(1.65rem,4.5vw,2.5rem);line-height:1.15;letter-spacing:-.03em;
  .float-card{font-size:.8rem;padding:10px 12px}.footer-inner{flex-direction:column;align-items:flex-start}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before{animation:none!important;transition:none!important}}
+
+/* toque */
+a,button,summary,input{touch-action:manipulation}
+.brand{min-height:44px}
+.chip{min-height:44px}
+.mcard{overflow-wrap:anywhere}
+.only-touch{display:none}
+details.rec{margin-top:8px;border-top:1px solid var(--line)}
+details.rec summary{cursor:pointer;font-weight:700;color:var(--green);min-height:44px;display:flex;align-items:center;font-size:.92rem}
+details.rec p{margin:0 0 10px}
+@media(pointer:coarse){#map.leaflet-container{touch-action:pan-y}.only-touch{display:inline}}
+@media(max-width:820px){.tabbar a{font-size:.75rem}}
+@media(max-width:560px){
+ .nav{min-height:56px}html{scroll-padding-top:64px}
+ .hero{padding:28px 0 32px}.visual{min-height:0;margin-top:4px}.orbit{width:170px}.float-card{display:none}
+ .filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+ .filters .chip{padding:8px 4px;text-align:center;font-size:.88rem;display:flex;align-items:center;justify-content:center;line-height:1.2}.filters .dsk{display:none}
+ #map{height:300px}
+ .section{padding:44px 0}
+}
 </style>
 </head>
 <body>
@@ -512,7 +532,7 @@ function cardHtml(p){
     (p.telefone?'<p><strong>Telefone:</strong> <a href="tel:'+esc(p.telefone.replace(/[^\d+]/g,''))+'">'+esc(p.telefone)+'</a></p>':'')+
     (p.horario?'<p><strong>Horário (pode estar desatualizado):</strong> '+esc(p.horario)+'</p>':'')+
     '<p><strong>Distância:</strong> cerca de '+fmtKm(p.dist)+' em linha reta</p>'+
-    '<p class="hint">'+recebe+' Ligue antes de ir.</p>'+
+    '<details class="rec"><summary>O que costuma receber</summary><p class="hint">'+recebe+' Ligue antes de ir.</p></details>'+
     '<p style="margin-top:10px"><a class="btn light" target="_blank" rel="noopener noreferrer" href="'+routeUrl(p)+'">'+ico('route')+' Abrir rota no Google Maps</a></p></article>';
 }
 function headHtml(){
@@ -526,7 +546,7 @@ function headHtml(){
     (LIVE.partial?'<p class="hint">Não foi possível carregar os dados de '+LIVE.partial+' agora. Tente de novo em instantes.</p>':'')+
     (!LIVE.loading&&np===0?'<p class="hint">Nenhum posto de saúde está mapeado no OpenStreetMap nessa área. Procure a UBS da sua região no site da prefeitura ou pelos links ao final.</p>':'')+
     (!LIVE.loading&&nf===0?'<p class="hint">Nenhuma farmácia está mapeada no OpenStreetMap nessa área. Use os links ao final.</p>':'')+'</article>'+
-    '<div class="filters" role="group" aria-label="Filtrar resultados">'+chip('all','Todos',nf+np)+chip('farm','Farmácias',nf)+chip('posto','Postos de saúde',np)+'</div>';
+    '<div class="filters" role="group" aria-label="Filtrar resultados">'+chip('all','Todos',nf+np)+chip('farm','Farmácias',nf)+chip('posto','Postos<span class="dsk"> de saúde</span>',np)+'</div>';
 }
 function renderHead(){
   const h=$('resHead');if(!h)return;
@@ -537,7 +557,7 @@ function renderHead(){
 function resultHtml(){
   return '<div id="resHead"></div>'+
     '<div class="mapbox"><div id="map" role="application" aria-label="Mapa das farmácias e postos de saúde encontrados"></div><div class="mapctl"><button class="btn light" type="button" id="zin" aria-label="Aproximar o mapa">+</button><button class="btn light" type="button" id="zout" aria-label="Afastar o mapa">−</button></div></div>'+
-    '<p class="hint">Pino verde: farmácia. Pino azul: posto de saúde. Mapa © colaboradores do <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>.</p>'+
+    '<p class="hint">Pino verde: farmácia. Pino azul: posto de saúde.<span class="only-touch"> Toque nos pinos e use + e − para ampliar.</span> Mapa © colaboradores do <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>.</p>'+
     '<div id="liveList"></div>';
 }
 function renderList(){
@@ -551,7 +571,8 @@ function drawMarkers(v){
   try{
     const me=[LIVE.center.latitude,LIVE.center.longitude];
     if(!lmap){
-      lmap=L.map(el,{zoomControl:false,attributionControl:false}).setView(me,14);
+      const toque=matchMedia('(pointer:coarse)').matches; /* em celular o dedo rola a página; o mapa usa os botões + e − */
+      lmap=L.map(el,{zoomControl:false,attributionControl:false,dragging:!toque,touchZoom:!toque,doubleClickZoom:!toque}).setView(me,14);
       /* Fundo do mapa: CARTO (não exige Referer, funciona até com o arquivo aberto no computador).
          Se falhar, troca para os tiles do OpenStreetMap, que só funcionam em site publicado (https). */
       let erros=0,trocou=false;
