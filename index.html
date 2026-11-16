@@ -228,20 +228,20 @@ details.rec p{margin:0 0 10px}
 <div class="form-row"><input class="field" id="city" inputmode="text" placeholder="Ex.: 35500-000 ou Divinópolis, MG" autocomplete="postal-code" enterkeyhint="search" aria-describedby="cityErr"><button class="btn" id="searchPlaces" type="button"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg> Pesquisar</button><button class="btn light" id="useLocation" type="button"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg> Usar localização</button></div>
 <div id="cityErr" role="alert"></div>
 <p class="hint">Funciona para qualquer CEP ou cidade do Brasil. Os locais vêm do OpenStreetMap, um mapa colaborativo que pode estar incompleto ou desatualizado.</p>
-<div class="notice"><strong>Antes de ir, ligue.</strong> O mapa não mostra o que cada local aceita, e a regra varia por município.</div>
+<div class="notice"><strong>Antes de ir, ligue.</strong> O mapa não mostra o que cada local aceita. Agulhas e seringas: só posto de saúde.</div>
 <div id="placeResult" style="margin-top:18px" aria-live="polite"></div></div>
 </div></section>
 
 <section class="section" id="orientacoes"><div class="wrap"><div class="section-head"><h2>Como descartar corretamente</h2><p>Alguns cuidados simples evitam riscos para pessoas e para o meio ambiente.</p></div><div class="steps">
 <div class="step"><h3>Separe os medicamentos</h3><p>Reúna os vencidos ou que não serão mais usados, mantendo-os nas embalagens sempre que possível.</p></div>
 <div class="step"><h3>Não despeje líquidos</h3><p>Não jogue xaropes, gotas ou outros medicamentos na pia, no vaso sanitário ou no ralo.</p></div>
-<div class="step"><h3>Leve a um ponto de coleta</h3><p>Procure uma farmácia ou drogaria com coletor, ou outro local que confirme receber medicamentos, e siga as instruções dele.</p></div>
+<div class="step"><h3>Leve a um ponto de coleta</h3><p>Procure uma farmácia ou drogaria com coletor, ou outro local que confirme receber medicamentos, e siga as instruções dele. Agulhas e seringas vão só ao posto de saúde.</p></div>
 <div class="step"><h3>Pergunte sobre embalagens</h3><p>Cartuchos e bulas sem contato com o medicamento podem ser recicláveis. Pergunte como separar blísteres, tubos e frascos.</p></div>
 </div>
 </div></section>
 
 
-<section class="section white" id="perfurocortantes"><div class="wrap"><div class="section-head"><h2>Agulhas, seringas e lancetas</h2><p>Perfurocortantes usados em casa não vão para o lixo comum nem para a reciclagem. Eles têm descarte próprio: <strong>posto de saúde ou farmácia</strong>.</p></div>
+<section class="section white" id="perfurocortantes"><div class="wrap"><div class="section-head"><h2>Agulhas, seringas e lancetas</h2><p>Perfurocortantes usados em casa não vão para o lixo comum nem para a reciclagem. Eles têm descarte próprio: <strong>posto de saúde (UBS)</strong>. Não leve a farmácias.</p></div>
 <div class="sharps-grid">
 <div class="panel"><h3>Como preparar para entregar</h3>
 <ol class="olist">
@@ -252,11 +252,11 @@ details.rec p{margin:0 0 10px}
 <li><strong>Proteja.</strong> Mantenha longe de crianças e animais até a entrega.</li>
 </ol></div>
 <div class="panel"><h3>Onde entregar</h3>
-<div class="where"><span class="card-icon" aria-hidden="true"><svg class="i"><use href="#i-pin"/></svg></span><div><h4>Posto de saúde (UBS)</h4><p>É a referência em muitos municípios. Leve o recipiente fechado e pergunte como a unidade recebe.</p></div></div>
-<div class="where"><span class="card-icon" aria-hidden="true"><svg class="i"><use href="#i-pin"/></svg></span><div><h4>Farmácia ou drogaria</h4><p>Algumas têm coletor para agulhas, seringas e canetas de aplicação. Nem todas: pergunte antes.</p></div></div>
-<p style="margin:16px 0 0"><a class="btn" id="goPostos" href="#pontos">Ver postos de saúde e farmácias perto de mim</a></p>
+<div class="where"><span class="card-icon" aria-hidden="true"><svg class="i"><use href="#i-pin"/></svg></span><div><h4>Posto de saúde (UBS)</h4><p>É o local para entregar agulhas, seringas e lancetas usadas. Leve o recipiente bem fechado e ligue antes para confirmar o horário.</p></div></div>
+<div class="where" style="background:var(--warn-bg)"><span class="card-icon" aria-hidden="true" style="background:var(--warn-bg);color:var(--warn-ink)"><svg class="i"><use href="#i-pin"/></svg></span><div><h4>Farmácia ou drogaria: não</h4><p>Farmácias podem receber medicamentos vencidos, mas não agulhas, seringas e lancetas.</p></div></div>
+<p style="margin:16px 0 0"><a class="btn" id="goPostos" href="#pontos">Ver postos de saúde perto de mim</a></p>
 </div></div>
-<div class="notice" style="max-width:850px;margin:22px auto 0"><strong>Atenção:</strong> não existe regra nacional única para perfurocortantes domésticos: o Ministério da Saúde deixa as ações de coleta com estados e municípios. Ligue antes de ir e não presuma que quem recebe medicamentos também recebe agulhas.</div>
+<div class="notice" style="max-width:850px;margin:22px auto 0"><strong>Atenção:</strong> agulhas, seringas e lancetas só vão para posto de saúde. Quem recebe medicamentos vencidos, como as farmácias, não recebe perfurocortantes.</div>
 </div></section>
 
 <section class="section impact" id="impacto"><div class="wrap"><div class="section-head"><h2>O descarte incorreto vai além da sua casa</h2><p>Medicamentos que chegam ao ambiente de forma inadequada podem contribuir para a contaminação e afetar organismos vivos.</p></div>
@@ -310,30 +310,35 @@ const setErr=(box,input,msg)=>{box.innerHTML=msg?'<p class="err">'+esc(msg)+'</p
    Formato: {nome:'',tipo:'posto'|'farm',endereco:'',telefone:'',horario:'',recebe:'texto do que o local aceita',lat:-0.0,lng:-0.0} */
 const VERIFIED=[];
 
+const CACHE_MS=12*3600*1000;
 const API={
   nominatim:'https://nominatim.openstreetmap.org/search',
   viacep:'https://viacep.com.br/ws/',
   brasilapi:'https://brasilapi.com.br/api/cep/v2/',
-  /* Vários servidores Overpass: se um estiver ocupado, o próximo é tentado */
-  overpass:['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.private.coffee/api/interpreter']
+  /* Os servidores são consultados AO MESMO TEMPO: vale o primeiro que responder */
+  overpass:['https://overpass-api.de/api/interpreter','https://lz4.overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.private.coffee/api/interpreter']
 };
 const inBR=c=>c&&isFinite(c.latitude)&&isFinite(c.longitude)&&c.latitude>-34&&c.latitude<6&&c.longitude>-74.5&&c.longitude<-28;
 function km(a,b,c,d){const R=6371,t=x=>x*Math.PI/180,h=Math.sin(t(c-a)/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(t(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const fmtKm=d=>d<1?Math.round(d*100)*10+' m':d.toFixed(1).replace('.',',')+' km';
 async function getJson(url,opt,ms){
-  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms||12000);
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms||8000);
+  if(opt&&opt.outer)opt.outer.addEventListener('abort',()=>ctl.abort());
   try{
-    const r=await fetch(url,Object.assign({},opt,{signal:ctl.signal}));
+    const o=Object.assign({},opt,{signal:ctl.signal});delete o.outer;
+    const r=await fetch(url,o);
     if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e}
     return await r.json();
   }finally{clearTimeout(t)}
 }
+/* primeira promessa que der certo (se todas falharem, rejeita com a lista de erros) */
+function firstOk(list){return new Promise((res,rej)=>{let n=list.length;const errs=[];if(!n)rej(errs);list.forEach((p,i)=>p.then(res,e=>{errs[i]=e;if(--n===0)rej(errs)}))})}
 
 /* --- 1. Do texto/CEP até coordenadas --- */
 async function nominatim(params){
   const base={format:'jsonv2',countrycodes:'br',limit:1,addressdetails:1};
   const qs=Object.entries(Object.assign(base,params)).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  const r=await getJson(API.nominatim+'?'+qs);
+  const r=await getJson(API.nominatim+'?'+qs,{},8000);
   if(!r[0])return null;
   const a=r[0].address||{},city=a.city||a.town||a.village||a.municipality||a.city_district||'';
   const c={latitude:+r[0].lat,longitude:+r[0].lon,name:[city,a.state].filter(Boolean).join(' - ')};
@@ -341,23 +346,21 @@ async function nominatim(params){
 }
 async function centerFromCep(cep){
   const fmt=cep.slice(0,5)+'-'+cep.slice(5);
+  /* BrasilAPI e ViaCEP ao mesmo tempo (antes eram em fila) */
+  const [b,v]=await Promise.allSettled([getJson(API.brasilapi+cep,{},6000),getJson(API.viacep+cep+'/json/',{},6000)]);
   let addr=null;
-  /* a) BrasilAPI v2: já devolve coordenadas quando conhece o CEP */
-  try{
-    const b=await getJson(API.brasilapi+cep);
-    addr={street:b.street,district:b.neighborhood,city:b.city,uf:b.state};
-    const co=b.location&&b.location.coordinates,c={latitude:parseFloat(co&&co.latitude),longitude:parseFloat(co&&co.longitude)};
+  if(b.status==='fulfilled'&&b.value){
+    const x=b.value;
+    addr={street:x.street,district:x.neighborhood,city:x.city,uf:x.state};
+    const co=x.location&&x.location.coordinates,c={latitude:parseFloat(co&&co.latitude),longitude:parseFloat(co&&co.longitude)};
     if(inBR(c))return{c,addr,precise:true};
-  }catch(e){}
-  /* b) ViaCEP: endereço do CEP, que depois é localizado no mapa */
-  if(!addr){
-    try{const v=await getJson(API.viacep+cep+'/json/');if(!v.erro)addr={street:v.logradouro,district:v.bairro,city:v.localidade,uf:v.uf}}catch(e){}
   }
-  /* c) Localizar o endereço no mapa (Nominatim pede no máximo 1 consulta por segundo) */
+  if(!addr&&v.status==='fulfilled'&&v.value&&!v.value.erro){const x=v.value;addr={street:x.logradouro,district:x.bairro,city:x.localidade,uf:x.uf}}
+  /* sem coordenadas: localiza o endereço no mapa (Nominatim aceita 1 consulta por segundo) */
   const tries=[];
   if(addr&&addr.street)tries.push({q:[addr.street,addr.district,addr.city,addr.uf,'Brasil'].filter(Boolean).join(', ')});
   if(addr&&addr.city)tries.push({q:[addr.city,addr.uf,'Brasil'].filter(Boolean).join(', ')});
-  tries.push({postalcode:fmt});
+  if(!addr)tries.push({postalcode:fmt});
   for(let i=0;i<tries.length;i++){
     try{
       const g=await nominatim(tries[i]);
@@ -387,59 +390,76 @@ async function resolveCenter(query){
 }
 
 /* --- 2. Consulta ao OpenStreetMap (Overpass) --- */
-/* Duas consultas simples (só ASCII, sem regex pesada): uma de farmácias e outra de unidades públicas de saúde */
-function overpassQueries(c,r){
-  const a='(around:'+r+','+c.latitude+','+c.longitude+')';
-  const head='[out:json][timeout:20];(';
-  return {
-    farm:head+'nwr["amenity"="pharmacy"]'+a+';nwr["healthcare"="pharmacy"]'+a+';);out center tags;',
-    posto:head+
-      'nwr["amenity"="clinic"]["operator:type"="public"]'+a+';'+
-      'nwr["amenity"="clinic"]["name"~"UBS|Posto|Unidade|Centro de Sa|PSF|ESF|USF|UPA",i]'+a+';'+
-      'nwr["amenity"="doctors"]["operator:type"="public"]'+a+';'+
-      'nwr["healthcare"="clinic"]["operator:type"="public"]'+a+';'+
-      ');out center tags;'
-  };
+const NAME_RX='UBS|ESF|PSF|USF|UAPS|Posto de Sa|Unidade B|Unidade de Sa|Centro de Sa|Sa.de da Fam';
+/* UMA única consulta (só ASCII) traz farmácias e unidades públicas de saúde */
+function overpassQuery(c,r){
+  const a='(around:'+r+','+c.latitude+','+c.longitude+')',pub='["operator:type"~"^(public|government)$"]',nm='["name"~"'+NAME_RX+'",i]';
+  return '[out:json][timeout:15];('+
+    'nwr["amenity"="pharmacy"]'+a+';nwr["healthcare"="pharmacy"]'+a+';'+
+    'nwr["amenity"~"^(clinic|doctors|health_post)$"]'+pub+a+';'+
+    'nwr["healthcare"~"^(clinic|centre|health_post)$"]'+pub+a+';'+
+    'nwr["amenity"~"^(clinic|doctors|health_post)$"]'+nm+a+';'+
+    'nwr["healthcare"~"^(clinic|centre|health_post)$"]'+nm+a+';'+
+  ');out center tags;';
 }
-/* Tenta cada servidor, primeiro por GET e depois por POST; guarda o motivo de cada falha */
+/* Pergunta a todos os servidores ao mesmo tempo, por GET; se todos falharem, tenta de novo por POST */
 async function overpassRun(q){
   const fails=[];
-  for(const u of API.overpass){
-    const host=u.replace('https://','').split('/')[0];
-    for(const mode of ['GET','POST']){
-      try{
-        const d=mode==='GET'
-          ?await getJson(u+'?data='+encodeURIComponent(q),{},25000)
-          :await getJson(u,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}},25000);
-        if(d&&Array.isArray(d.elements))return d.elements;
-        fails.push(host+' '+mode+': resposta inválida');
-      }catch(e){
-        fails.push(host+' '+mode+': '+(e.status?'HTTP '+e.status:(e.name==='AbortError'?'tempo esgotado':'bloqueado ou sem conexão')));
-        if(e.status===400)break; /* consulta recusada: POST não vai mudar */
-      }
-    }
+  for(const mode of ['GET','POST']){
+    const outer=new AbortController();
+    const jobs=API.overpass.map(u=>{
+      const host=u.replace('https://','').split('/')[0];
+      const opt=mode==='GET'?{outer:outer.signal}:{outer:outer.signal,method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}};
+      const url=mode==='GET'?u+'?data='+encodeURIComponent(q):u;
+      return getJson(url,opt,12000).then(d=>{
+        if(!d||!Array.isArray(d.elements))throw new Error('resposta inválida');
+        if(!d.elements.length&&/timed out|out of memory|runtime error/i.test(d.remark||''))throw new Error('servidor sobrecarregado');
+        return d.elements;
+      }).catch(e=>{fails.push(host+' '+mode+': '+(e.status?'HTTP '+e.status:(e.name==='AbortError'?'tempo esgotado':(e.message&&!/fetch/i.test(e.message)?e.message:'bloqueado ou sem conexão'))));throw e});
+    });
+    try{const els=await firstOk(jobs);outer.abort();return els}catch(e){outer.abort()}
   }
   const err=new Error('overpass');err.details=fails;throw err;
 }
+/* Cache dos dados brutos por "quadrado" de ~2 km: CEPs vizinhos reaproveitam a mesma consulta (12 h) */
+function slim(e){
+  const t=e.tags||{},keep={};
+  ['amenity','healthcare','name','operator:type','addr:street','addr:housenumber','addr:suburb','addr:city','addr:full','phone','contact:phone','opening_hours'].forEach(k=>{if(t[k]!=null)keep[k]=t[k]});
+  return{lat:e.lat!=null?e.lat:(e.center&&e.center.lat),lon:e.lon!=null?e.lon:(e.center&&e.center.lon),tags:keep};
+}
+async function placesAround(c,r){
+  /* centro "encaixado" na grade de 0,02° e raio maior para cobrir o ponto real */
+  const sc={latitude:Math.round(c.latitude/0.02)*0.02,longitude:Math.round(c.longitude/0.02)*0.02};
+  const key='dc:ov:'+sc.latitude.toFixed(2)+','+sc.longitude.toFixed(2)+':'+r;
+  try{const v=JSON.parse(localStorage.getItem(key)||'null');if(v&&Date.now()-v.ts<CACHE_MS&&Array.isArray(v.els))return v.els}catch(e){}
+  const els=(await overpassRun(overpassQuery(sc,r+1600))).map(slim);
+  try{localStorage.setItem(key,JSON.stringify({ts:Date.now(),els}))}catch(e){}
+  return els;
+}
 const NOT_POSTO=/(^|\W)caps(\W|$)|psicossocial|veterin|odont|laborat|hemocentro|fisioter|est[eé]tica/i;
+const NOT_UBS=/(^|\W)upa(\W|$)|pronto.?socorro|hospital|maternidade|santa casa/i;
+const IS_UBS=/(^|\W)(ubs|esf|psf|usf|uaps)(\W|$)|posto de sa|unidade b[aá]sica|centro de sa|sa[uú]de da fam/i;
 function kindOf(t){
   const nm=t.name||'';
   if(t.amenity==='pharmacy'||t.healthcare==='pharmacy')return /veterin/i.test(nm)?null:'farm';
   if(t['operator:type']==='private'||t.amenity==='dentist'||NOT_POSTO.test(nm))return null;
+  if(NOT_UBS.test(nm)&&!IS_UBS.test(nm))return null;
   return 'posto';
 }
-function parseElements(els,c){
+function parseElements(els,c,maxKm){
   const out=[];
   els.forEach(e=>{
     const t=e.tags||{},kind=kindOf(t);if(!kind)return;
     const lat=e.lat!=null?e.lat:(e.center&&e.center.lat),lng=e.lon!=null?e.lon:(e.center&&e.center.lon);
     if(lat==null||lng==null)return;
+    const dist=km(c.latitude,c.longitude,lat,lng);
+    if(maxKm&&dist>maxKm)return;
     const nome=t.name||(kind==='farm'?'Farmácia (sem nome cadastrado)':'Unidade de saúde (sem nome cadastrado)');
     /* o mesmo local pode estar mapeado como ponto e como prédio: ignora repetidos com o mesmo nome a menos de 150 m */
     if(t.name&&out.some(o=>o.kind===kind&&norm(o.nome)===norm(nome)&&km(o.lat,o.lng,lat,lng)<0.15))return;
     const rua=[t['addr:street'],t['addr:housenumber']].filter(Boolean).join(', ');
     const endereco=t['addr:full']||[rua,t['addr:suburb'],t['addr:city']].filter(Boolean).join(' - ');
-    out.push({kind,nome,endereco,telefone:t.phone||t['contact:phone']||'',horario:t.opening_hours||'',lat,lng,dist:km(c.latitude,c.longitude,lat,lng)});
+    out.push({kind,nome,endereco,telefone:t.phone||t['contact:phone']||'',horario:t.opening_hours||'',lat,lng,dist});
   });
   VERIFIED.forEach(p=>{
     if(p.lat==null||p.lng==null)return;
@@ -452,9 +472,9 @@ function parseElements(els,c){
 async function nominatimPlaces(c){
   const d=0.06,vb=[c.longitude-d,c.latitude+d,c.longitude+d,c.latitude-d].join(',');
   const els=[],okType={pharmacy:1,clinic:1,doctors:1,hospital:1,health_centre:1,centre:1};
-  for(const q of ['farmacia','unidade basica de saude','posto de saude']){
+  for(const q of ['farmacia','unidade basica de saude']){
     try{
-      const r=await getJson(API.nominatim+'?format=jsonv2&addressdetails=1&limit=40&bounded=1&viewbox='+vb+'&q='+encodeURIComponent(q));
+      const r=await getJson(API.nominatim+'?format=jsonv2&addressdetails=1&limit=40&bounded=1&viewbox='+vb+'&q='+encodeURIComponent(q),{},8000);
       r.forEach(x=>{
         if(!okType[x.type]||(x.category!=='amenity'&&x.category!=='healthcare'))return;
         const a=x.address||{};
@@ -465,30 +485,27 @@ async function nominatimPlaces(c){
   }
   return els;
 }
-/* Começa em 5 km e só amplia se faltarem farmácias ou postos. A cada raio, avisa a tela (onStep) para mostrar os resultados já */
+/* Começa em 4 km e só amplia se faltarem postos ou farmácias. A cada raio, avisa a tela (onStep) para mostrar o que já achou */
 async function findPlaces(c,onStep){
   let best=null,lastErr=null;
   const pack=(b,alt)=>{
     const top=k=>b.all.filter(i=>i.kind===k).slice(0,8);
-    return{items:[...top('farm'),...top('posto')].sort((x,y)=>x.dist-y.dist),radius:b.radius,alt:!!alt,partial:b.partial||''};
+    return{items:[...top('farm'),...top('posto')].sort((x,y)=>x.dist-y.dist),radius:b.radius,alt:!!alt,partial:''};
   };
-  for(const r of [5000,12000,25000]){
-    const qs=overpassQueries(c,r);
-    const [f,p]=await Promise.allSettled([overpassRun(qs.farm),overpassRun(qs.posto)]);
-    if(f.status==='rejected'&&p.status==='rejected'){lastErr=f.reason;break}
-    const els=[].concat(f.status==='fulfilled'?f.value:[],p.status==='fulfilled'?p.value:[]);
-    const all=parseElements(els,c);
-    best={all,radius:r/1000,partial:f.status==='rejected'?'farmácias':(p.status==='rejected'?'postos de saúde':'')};
-    const enough=all.filter(i=>i.kind==='farm').length>=3&&all.filter(i=>i.kind==='posto').length>=3;
+  for(const r of [4000,10000,20000]){
+    let els;
+    try{els=await placesAround(c,r)}catch(e){lastErr=e;break}
+    const all=parseElements(els,c,r/1000);
+    best={all,radius:r/1000};
+    const enough=all.filter(i=>i.kind==='farm').length>=2&&all.filter(i=>i.kind==='posto').length>=2;
     if(enough)break;
-    if(onStep&&r<25000&&all.length)onStep(pack(best)); /* já mostra o que achou enquanto amplia */
+    if(onStep&&r<20000&&all.length)onStep(pack(best));
   }
   if(!best){
-    /* Overpass indisponível: tenta o Nominatim */
     const els=await nominatimPlaces(c);
     const all=parseElements(els,c);
     if(!all.length){const e=new Error('sem fontes');e.details=(lastErr&&lastErr.details)||[];throw e}
-    return pack({all,radius:6.6,partial:''},true);
+    return pack({all,radius:6.6},true);
   }
   return pack(best,false);
 }
@@ -508,8 +525,8 @@ function visible(){return LIVE.items.filter(i=>filter==='all'||i.kind===filter).
 function cardHtml(p){
   const f=p.kind==='farm';
   const recebe=p.recebe||(f
-    ?'<strong>Medicamentos vencidos:</strong> só se a unidade tiver o coletor do programa de logística reversa. <strong>Perfurocortantes:</strong> só se tiver coletor próprio.'
-    :'<strong>Perfurocortantes:</strong> muitas unidades de saúde recebem, mas a regra varia por município. <strong>Medicamentos:</strong> pergunte na unidade.');
+    ?'<strong>Medicamentos vencidos:</strong> só se participar do programa de logística reversa. <strong>Agulhas, seringas e lancetas:</strong> não leve aqui, entregue em um posto de saúde.'
+    :'<strong>Agulhas, seringas e lancetas:</strong> é o local indicado, em recipiente rígido e bem fechado. <strong>Medicamentos:</strong> pergunte na unidade.');
   return '<article class="mcard" id="pt'+p.n+'"><span class="tag '+(f?'farm':'posto')+'">'+(f?'Farmácia':'Posto de saúde / UBS')+'</span>'+(p.confirmado?' <span class="tag ok">Confirmado por este site</span>':'')+
     '<h3>'+p.n+'. '+esc(p.nome)+'</h3>'+
     (p.endereco?'<p><strong>Endereço:</strong> '+esc(p.endereco)+'</p>':'')+
@@ -588,7 +605,6 @@ function setFilter(f){
   if(LIVE&&$('liveList'))renderList();
 }
 /* ----- cache no navegador (12 h): pesquisar o mesmo CEP de novo é instantâneo ----- */
-const CACHE_MS=12*3600*1000;
 function cacheKey(q){return q.cep?'cep:'+q.cep:q.coords?'geo:'+q.coords.latitude.toFixed(3)+','+q.coords.longitude.toFixed(3):'txt:'+norm(q.text)}
 function cacheGet(q){try{const v=JSON.parse(localStorage.getItem('dc:'+cacheKey(q))||'null');return v&&Date.now()-v.ts<CACHE_MS?v:null}catch(e){return null}}
 function cachePut(q,d){try{localStorage.setItem('dc:'+cacheKey(q),JSON.stringify(Object.assign({ts:Date.now()},d)))}catch(e){}}
